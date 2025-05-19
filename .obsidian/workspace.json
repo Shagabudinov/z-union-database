@@ -13,12 +13,12 @@
             "state": {
               "type": "split-diff-view",
               "state": {
-                "aFile": ".obsidian/app.json",
-                "bFile": ".obsidian/app.json",
+                "aFile": ".obsidian/plugins/obsidian-kanban/manifest.json",
+                "bFile": ".obsidian/plugins/obsidian-kanban/manifest.json",
                 "aRef": ""
               },
               "icon": "diff",
-              "title": "Diff: app.json"
+              "title": "Diff: manifest.json"
             }
           }
         ]
@@ -174,7 +174,8 @@
       "templates:Вставить шаблон": false,
       "command-palette:Открыть палитру команд": false,
       "obsidian-kanban:Создать новую доску": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "terminal:Open terminal": false
     }
   },
   "active": "9023b0e670814821",
