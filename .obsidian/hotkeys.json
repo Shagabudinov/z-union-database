@@ -1,0 +1,26 @@
+{
+  "obsidian-git:pull": [
+    {
+      "modifiers": [
+        "Shift"
+      ],
+      "key": "."
+    }
+  ],
+  "obsidian-git:push2": [
+    {
+      "modifiers": [
+        "Shift"
+      ],
+      "key": "/"
+    }
+  ],
+  "obsidian-git:init-repo": [
+    {
+      "modifiers": [
+        "Shift"
+      ],
+      "key": "]"
+    }
+  ]
+}
