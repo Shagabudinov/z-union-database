@@ -2,7 +2,7 @@ const { Plugin, debounce } = require('obsidian');
 
 module.exports = class PeriodicSyncPlugin extends Plugin {
   async onload() {
-    console.log('Periodic Sync Plugin загружен - режим реального времени');
+    console.log('Periodic Sync Plugin загружен - режим реального времени1');
 
     // Перезапуск плагина для обеспечения корректной инициализации
     await this.restartPluginOnFirstLoad();
