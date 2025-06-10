@@ -23,8 +23,8 @@
                   ]
                 }
               },
-              "icon": "lucide-trello",
-              "title": "Безымянная Kanban-доска"
+              "icon": "lucide-file",
+              "title": "Плагин больше не активен"
             }
           },
           {
@@ -212,8 +212,8 @@
       "templates:Вставить шаблон": false,
       "command-palette:Открыть палитру команд": false,
       "obsidian-kanban:Создать новую доску": false,
-      "remotely-save:Remotely Save": false,
-      "obsidian-git:Open Git source control": false
+      "obsidian-git:Open Git source control": false,
+      "remotely-save:Remotely Save": false
     }
   },
   "active": "7bc5d78cc3d5abb8",
