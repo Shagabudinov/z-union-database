@@ -24,53 +24,105 @@ const HIDDEN_NOTIFICATION_PREFIXES = [
  */
 module.exports = class HideAnnoyingNotifications extends Plugin {
   async onload() {
-    console.log('Hide Annoying Notifications: Режим полного скрытия активирован');
+    console.log('Hide Annoying Notifications: Активация плагина');
     
-    // Перезапуск плагина для обеспечения корректной инициализации
-    await this.restartPluginOnFirstLoad();
-    
-    this.initializeNotificationHiding();
+    // Инициализируем плагин немедленно
+    this.initializePlugin();
   }
 
   /**
-   * Принудительный перезапуск плагина при каждом открытии хранилища
+   * Инициализация плагина с множественными стратегиями
    */
-  async restartPluginOnFirstLoad() {
-    const pluginId = this.manifest.id;
-    const currentTime = Date.now();
-    const lastRestartKey = `${pluginId}-last-restart`;
-    const minRestartInterval = 2000; // Минимальный интервал между перезапусками
+  initializePlugin() {
+    // Стратегия 1: Немедленная попытка инициализации
+    this.tryInitializeNotificationHiding();
     
-    // Получаем время последнего перезапуска
-    const lastRestart = parseInt(localStorage.getItem(lastRestartKey) || '0');
+    // Стратегия 2: После готовности workspace
+    this.app.workspace.onLayoutReady(() => {
+      this.tryInitializeNotificationHiding();
+    });
     
-    // Проверяем, прошло ли достаточно времени с последнего перезапуска
-    if (currentTime - lastRestart > minRestartInterval) {
-      localStorage.setItem(lastRestartKey, currentTime.toString());
+    // Стратегия 3: Отложенная инициализация с повторными попытками
+    setTimeout(() => {
+      this.initializeWithRetries();
+    }, 100);
+  }
+
+  /**
+   * Инициализация с повторными попытками
+   */
+  initializeWithRetries() {
+    let attempts = 0;
+    const maxAttempts = 10;
+    const retryInterval = 500;
+    
+    const tryInit = () => {
+      attempts++;
       
-      console.log(`${pluginId}: Принудительный перезапуск при открытии хранилища`);
+      if (this.tryInitializeNotificationHiding()) {
+        console.log(`Hide Annoying Notifications: Успешная инициализация с ${attempts} попытки`);
+        return;
+      }
       
-      // Небольшая задержка для стабильности
-      setTimeout(async () => {
-        try {
-          await this.app.plugins.disablePlugin(pluginId);
-          await this.app.plugins.enablePlugin(pluginId);
-        } catch (error) {
-          console.error(`Ошибка перезапуска ${pluginId}:`, error);
-        }
-      }, 150);
-      
-      return true; // Плагин будет перезапущен
+      if (attempts < maxAttempts) {
+        setTimeout(tryInit, retryInterval);
+      } else {
+        console.warn('Hide Annoying Notifications: Не удалось найти контейнер уведомлений после всех попыток');
+      }
+    };
+    
+    tryInit();
+  }
+
+  /**
+   * Попытка инициализации системы скрытия уведомлений
+   * @returns {boolean} true если инициализация успешна
+   */
+  tryInitializeNotificationHiding() {
+    // Избегаем повторной инициализации
+    if (this.observer) {
+      return true;
     }
     
-    console.log(`${pluginId}: Перезапуск пропущен (слишком рано)`);
-    return false; // Перезапуск пропущен
+    const container = this.findNotificationContainer();
+    if (!container) {
+      return false;
+    }
+    
+    this.setupNotificationObserver(container);
+    
+    // Скрываем существующие уведомления
+    this.hideExistingNotifications(container);
+    
+    return true;
   }
 
   /**
-   * Инициализация системы скрытия уведомлений
+   * Поиск контейнера уведомлений
    */
-  initializeNotificationHiding() {
+  findNotificationContainer() {
+    // Множественные селекторы для поиска контейнера
+    const selectors = [
+      ".notice-container",
+      ".notifications",
+      ".notification-container"
+    ];
+    
+    for (const selector of selectors) {
+      const container = document.querySelector(selector);
+      if (container) {
+        console.log(`Найден контейнер уведомлений: ${selector}`);
+        return container;
+      }
+    }
+    
+    return null;
+  }
+
+  /**
+   * Настройка наблюдателя за уведомлениями
+   */
+  setupNotificationObserver(container) {
     this.observer = new MutationObserver((mutations) => {
       mutations.forEach(mutation => {
         mutation.addedNodes.forEach(node => {
@@ -79,9 +131,25 @@ module.exports = class HideAnnoyingNotifications extends Plugin {
       });
     });
 
-    // Ожидаем полной загрузки DOM
-    this.app.workspace.onLayoutReady(() => {
-      this.startObserving();
+    this.observer.observe(container, { 
+      childList: true,
+      subtree: true
+    });
+    
+    console.log('Hide Annoying Notifications: Наблюдение активировано - все уведомления будут скрыты');
+  }
+
+  /**
+   * Скрытие уже существующих уведомлений
+   */
+  hideExistingNotifications(container) {
+    const existingNotices = container.querySelectorAll('.notice');
+    existingNotices.forEach(notice => {
+      const notificationText = notice.textContent?.trim();
+      if (this.shouldHideNotification(notificationText)) {
+        notice.remove();
+        console.log(`Скрыто существующее уведомление: ${notificationText}`);
+      }
     });
   }
 
@@ -109,21 +177,11 @@ module.exports = class HideAnnoyingNotifications extends Plugin {
     return true;
   }
 
-  /**
-   * Запуск наблюдения за контейнером уведомлений
-   */
-  startObserving() {
-    const container = document.querySelector(".notice-container");
-    if (container) {
-      this.observer.observe(container, { childList: true });
-      console.log('Наблюдение за уведомлениями запущено - все уведомления будут скрыты');
-    }
-  }
-
   onunload() {
     console.log('Hide Annoying Notifications: деактивирован');
     if (this.observer) {
       this.observer.disconnect();
+      this.observer = null;
     }
   }
 };
