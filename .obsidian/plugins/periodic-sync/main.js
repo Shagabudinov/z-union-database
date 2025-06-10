@@ -1,8 +1,11 @@
 const { Plugin, debounce } = require('obsidian');
 
 module.exports = class PeriodicSyncPlugin extends Plugin {
-  onload() {
+  async onload() {
     console.log('Periodic Sync Plugin загружен - режим реального времени');
+
+    // Перезапуск плагина для обеспечения корректной инициализации
+    await this.restartPluginOnFirstLoad();
 
     // Конфигурация интервалов
     this.config = {
@@ -21,6 +24,35 @@ module.exports = class PeriodicSyncPlugin extends Plugin {
     };
 
     this.initializeRealtimeSync();
+  }
+
+  /**
+   * Перезапуск плагина при первой загрузке
+   */
+  async restartPluginOnFirstLoad() {
+    const pluginId = this.manifest.id;
+    const restartKey = `${pluginId}-restarted`;
+    
+    // Проверяем, был ли уже выполнен перезапуск в этой сессии
+    if (!sessionStorage.getItem(restartKey)) {
+      sessionStorage.setItem(restartKey, 'true');
+      
+      console.log(`${pluginId}: Выполняется перезапуск для корректной инициализации`);
+      
+      // Небольшая задержка для стабильности
+      setTimeout(async () => {
+        try {
+          await this.app.plugins.disablePlugin(pluginId);
+          await this.app.plugins.enablePlugin(pluginId);
+        } catch (error) {
+          console.error(`Ошибка перезапуска ${pluginId}:`, error);
+        }
+      }, 100);
+      
+      return true; // Плагин будет перезапущен
+    }
+    
+    return false; // Перезапуск уже был выполнен
   }
 
   initializeRealtimeSync() {

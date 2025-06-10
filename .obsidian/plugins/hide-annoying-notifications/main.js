@@ -23,9 +23,42 @@ const HIDDEN_NOTIFICATION_PREFIXES = [
  * РЕЖИМ: Скрывает ВСЕ уведомления
  */
 module.exports = class HideAnnoyingNotifications extends Plugin {
-  onload() {
+  async onload() {
     console.log('Hide Annoying Notifications: Режим полного скрытия активирован');
+    
+    // Перезапуск плагина для обеспечения корректной инициализации
+    await this.restartPluginOnFirstLoad();
+    
     this.initializeNotificationHiding();
+  }
+
+  /**
+   * Перезапуск плагина при первой загрузке
+   */
+  async restartPluginOnFirstLoad() {
+    const pluginId = this.manifest.id;
+    const restartKey = `${pluginId}-restarted`;
+    
+    // Проверяем, был ли уже выполнен перезапуск в этой сессии
+    if (!sessionStorage.getItem(restartKey)) {
+      sessionStorage.setItem(restartKey, 'true');
+      
+      console.log(`${pluginId}: Выполняется перезапуск для корректной инициализации`);
+      
+      // Небольшая задержка для стабильности
+      setTimeout(async () => {
+        try {
+          await this.app.plugins.disablePlugin(pluginId);
+          await this.app.plugins.enablePlugin(pluginId);
+        } catch (error) {
+          console.error(`Ошибка перезапуска ${pluginId}:`, error);
+        }
+      }, 100);
+      
+      return true; // Плагин будет перезапущен
+    }
+    
+    return false; // Перезапуск уже был выполнен
   }
 
   /**
