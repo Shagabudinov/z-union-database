@@ -6,4 +6,4 @@ git clone https://github.com/Shagabudinov/z-union-database.git
 2. Открыть Obsidian Client и добавить новое хранилище выбрав эту папку
 ![[Pasted image 20250610145457.png]]
 ![[Pasted image 20250610145516.png]]
-3. Теперь хранилище 
+3. Теперь хранилище будет синхронизировать все изменения и отправлять бекапы в гитхаб
