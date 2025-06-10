@@ -11,28 +11,20 @@
             "id": "dc02c18a4b81ed9f",
             "type": "leaf",
             "state": {
-              "type": "markdown",
+              "type": "kanban",
               "state": {
-                "file": "Тест.md",
-                "mode": "source",
-                "source": false
+                "file": "Безымянная Kanban-доска.md",
+                "kanbanViewState": {
+                  "kanban-plugin": "board",
+                  "list-collapse": [
+                    false,
+                    false,
+                    false
+                  ]
+                }
               },
-              "icon": "lucide-file",
-              "title": "Тест"
-            }
-          },
-          {
-            "id": "e84f7665dae4ca8d",
-            "type": "leaf",
-            "state": {
-              "type": "markdown",
-              "state": {
-                "file": "Тест.md",
-                "mode": "source",
-                "source": false
-              },
-              "icon": "lucide-file",
-              "title": "Тест"
+              "icon": "lucide-trello",
+              "title": "Безымянная Kanban-доска"
             }
           },
           {
@@ -64,7 +56,7 @@
             }
           }
         ],
-        "currentTab": 3
+        "currentTab": 2
       }
     ],
     "direction": "vertical"
@@ -226,12 +218,12 @@
   },
   "active": "7bc5d78cc3d5abb8",
   "lastOpenFiles": [
-    "ghbdt ntcn.md",
-    "Тестовый документ.md",
-    "Безымянная Kanban-доска.md",
     "Тест.md",
-    "_merge-conflicts",
+    "Тестовый документ.md",
     "Тест1.md",
+    "ghbdt ntcn.md",
+    "Безымянная Kanban-доска.md",
+    "_merge-conflicts",
     "Работаю (Влад).md",
     "Тестовая штука.md",
     "Добро пожаловать.md",
