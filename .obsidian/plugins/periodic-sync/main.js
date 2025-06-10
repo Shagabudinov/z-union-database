@@ -27,17 +27,22 @@ module.exports = class PeriodicSyncPlugin extends Plugin {
   }
 
   /**
-   * Перезапуск плагина при первой загрузке
+   * Принудительный перезапуск плагина при каждом открытии хранилища
    */
   async restartPluginOnFirstLoad() {
     const pluginId = this.manifest.id;
-    const restartKey = `${pluginId}-restarted`;
+    const currentTime = Date.now();
+    const lastRestartKey = `${pluginId}-last-restart`;
+    const minRestartInterval = 2000; // Минимальный интервал между перезапусками
     
-    // Проверяем, был ли уже выполнен перезапуск в этой сессии
-    if (!sessionStorage.getItem(restartKey)) {
-      sessionStorage.setItem(restartKey, 'true');
+    // Получаем время последнего перезапуска
+    const lastRestart = parseInt(localStorage.getItem(lastRestartKey) || '0');
+    
+    // Проверяем, прошло ли достаточно времени с последнего перезапуска
+    if (currentTime - lastRestart > minRestartInterval) {
+      localStorage.setItem(lastRestartKey, currentTime.toString());
       
-      console.log(`${pluginId}: Выполняется перезапуск для корректной инициализации`);
+      console.log(`${pluginId}: Принудительный перезапуск при открытии хранилища`);
       
       // Небольшая задержка для стабильности
       setTimeout(async () => {
@@ -47,12 +52,13 @@ module.exports = class PeriodicSyncPlugin extends Plugin {
         } catch (error) {
           console.error(`Ошибка перезапуска ${pluginId}:`, error);
         }
-      }, 100);
+      }, 150);
       
       return true; // Плагин будет перезапущен
     }
     
-    return false; // Перезапуск уже был выполнен
+    console.log(`${pluginId}: Перезапуск пропущен (слишком рано)`);
+    return false; // Перезапуск пропущен
   }
 
   initializeRealtimeSync() {
