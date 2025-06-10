@@ -1,4 +1,7 @@
 [
   "obsidian-kanban",
-  "obsidian-git"
+  "obsidian-git",
+  "remotely-save",
+  "periodic-sync",
+  "hide-annoying-notifications"
 ]

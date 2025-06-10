@@ -22,5 +22,14 @@
       ],
       "key": "]"
     }
+  ],
+  "editor:save-file": [],
+  "remotely-save:start-sync": [
+    {
+      "modifiers": [
+        "Mod"
+      ],
+      "key": "Q"
+    }
   ]
 }
